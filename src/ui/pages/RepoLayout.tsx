@@ -13,6 +13,27 @@ import {
 import { getRepository } from "../repoCache.js";
 import { type RepoOutletContext } from "../repoOutletContext.js";
 
+function mirrorUrl(
+  config: ReadonlyMap<string, readonly (string | null)[]>,
+): string | undefined {
+  for (const [key, values] of config) {
+    // push mirror
+    const pushMirror = key.endsWith(".mirror") && values.includes("true");
+    // fetch mirror
+    const fetchMirror =
+      key.endsWith(".fetch") && values.includes("+refs/*:refs/*");
+    if (pushMirror || fetchMirror) {
+      const remoteName = key.slice("remote.".length, key.lastIndexOf("."));
+      if (key.startsWith("remote.") && remoteName) {
+        const urls = config.get(`remote.${remoteName}.url`);
+        const url = urls?.find((value): value is string => value !== null);
+        if (url) return url;
+      }
+    }
+  }
+  return undefined;
+}
+
 function defaultRevFromHead(
   headSymref: string | undefined,
   headOid: string,
@@ -31,10 +52,14 @@ export function RepoLayout() {
 
   const state = useAsync(async () => {
     const repository = await getRepository(repoUrl);
-    const head = await repository.head();
+    const [head, config] = await Promise.all([
+      repository.head(),
+      repository.config(),
+    ]);
     return {
       repository,
       defaultRev: defaultRevFromHead(head.symref, head.oid),
+      mirrorUrl: config ? mirrorUrl(config) : undefined,
     };
   }, [repoUrl]);
 
@@ -69,6 +94,12 @@ export function RepoLayout() {
         </h1>
         <p className="repo-url">
           git clone {new URL(repoUrl, globalThis.location.href).href}
+          {state.data.mirrorUrl && (
+            <>
+              {" — mirror of "}
+              <a href={state.data.mirrorUrl}>{state.data.mirrorUrl}</a>
+            </>
+          )}
         </p>
         <nav className="tabs">
           <NavLink to={summaryPath(repoUrl)} end>
