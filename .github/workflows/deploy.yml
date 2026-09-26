@@ -46,9 +46,10 @@ jobs:
         echo "url=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}" >> "$GITHUB_OUTPUT"
     - name: Build site
       env:
-        VITE_FEATURED_REPOS: >-
-          [{"name": "rgitweb (this site's own history)", "url": "./git"}]
+        VITE_CONFIG_PATH: ./config.json
       run: npm run build
+    - name: Add featured repository config
+      run: cp .github/demo.config.json dist/config.json
     - name: Publish this repository's history as a dumb-HTTP repo
       run: |
         cp -r .git dist/git

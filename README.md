@@ -39,19 +39,20 @@ See `AGENTS.md` for architecture notes and conventions.
 
 ## Featured repositories
 
-The start page lists only repositories configured at build time (see
-`src/ui/featuredRepos.ts`), rather than taking an arbitrary URL — most Git
-hosts don't send the CORS headers this app needs, so a free-text box mostly
-produces CORS errors. Set the `VITE_FEATURED_REPOS` environment variable to a
-JSON array of `{"name": "...", "url": "..."}` objects before building to
-populate it.
+The start page can list repositories configured by a JSON file rather than
+taking an arbitrary URL — most Git hosts don't send the CORS headers this app
+needs, so a free-text box mostly produces CORS errors. Set `VITE_CONFIG_PATH`
+at build time to fetch a config file whose current schema contains a
+`featuredRepos` array of objects with `name` and `url` strings. When
+`VITE_CONFIG_PATH` is unset, no config is fetched.
 
 ## Example deployment
 
 `.github/workflows/deploy.yml` publishes this repository's own history to
 GitHub Pages as a demo: it builds the site, copies this repo's `.git`
 directory into the output, runs `git update-server-info` on the copy, and
-points the featured-repositories list at the result — so the deployed site
+copies `.github/demo.config.json` to `dist/config.json`. That config points
+the featured-repositories list at the published copy, so the deployed site
 can browse its own source.
 
 This requires the repository's Pages source to be set to "GitHub Actions"

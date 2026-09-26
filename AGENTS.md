@@ -58,11 +58,13 @@ These are true of the implementation but not obvious from `types.ts`:
 The start page (`src/ui/pages/StartPage.tsx`) does not take an arbitrary
 repository URL — most Git hosts don't send the CORS headers this app needs,
 so a free-text box mostly produces CORS errors rather than a working demo.
-It lists only repositories from `src/ui/featuredRepos.ts`, which reads the
-`VITE_FEATURED_REPOS` build-time environment variable (a JSON array of
-`{"name", "url"}`) and falls back to an empty list. `.github/workflows/deploy.yml`
-sets this to point at a copy of this repository's own history, published
-alongside the site itself (see below).
+It can list repositories from a runtime config file whose current schema has
+a `featuredRepos` array. `VITE_CONFIG_PATH` selects the config URL at build
+time; when it is unset, the app does not fetch a config. The example
+`.github/workflows/deploy.yml` sets this path and copies
+`.github/demo.config.json` to `dist/config.json` after building, pointing at a
+copy of this repository's own history published alongside the site (see
+below).
 
 ## Example deployment
 
