@@ -103,11 +103,11 @@ export function TreePage() {
   return (
     <div>
       {path && <Breadcrumbs repoUrl={url} rev={rev} path={path} />}
-      <div className="section-heading">
-        <p className="summary">
+      <div className="panel tree-commit">
+        <div className="summary">
           <OidLink repoUrl={url} oid={state.data.commitOid} />{" "}
           {summaryLine(state.data.commitMessage)}
-        </p>
+        </div>
         <Link to={logPath(url, rev, { path: path || undefined })}>
           view log →
         </Link>

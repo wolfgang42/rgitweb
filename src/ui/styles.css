@@ -176,6 +176,14 @@ th {
   margin: 1rem 0;
 }
 
+.tree-commit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--bg-alt);
+}
+
 .panel-error {
   background: var(--error-bg);
   border-color: var(--error-border);
