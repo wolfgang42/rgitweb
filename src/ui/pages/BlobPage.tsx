@@ -60,7 +60,7 @@ export function BlobPage() {
   const [showRendered, setShowRendered] = useState(true);
 
   const bytes = state.status === "success" ? state.data.bytes : undefined;
-  const objectUrl = useObjectUrl(bytes);
+  const objectUrl = useObjectUrl(bytes, filename);
 
   if (state.status === "loading") {
     return <LoadingPanel />;
