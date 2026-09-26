@@ -17,15 +17,19 @@ import {
 
 function AnnotatedTagRow({
   repoUrl,
+  refName,
   tag,
 }: {
   readonly repoUrl: string;
+  readonly refName: string;
   readonly tag: AnnotatedTag;
 }) {
   return (
     <tr>
       <td className="ref-name">
-        <Link to={treePath(repoUrl, tag.targetOid)}>{tag.name}</Link>
+        <Link to={treePath(repoUrl, refName.slice("refs/tags/".length))}>
+          {tag.name}
+        </Link>
       </td>
       <td>
         <OidLink repoUrl={repoUrl} oid={tag.targetOid} />
@@ -69,7 +73,9 @@ function TagRow({
       </tr>
     );
   }
-  return <AnnotatedTagRow repoUrl={repoUrl} tag={state.data} />;
+  return (
+    <AnnotatedTagRow repoUrl={repoUrl} refName={tagRef.name} tag={state.data} />
+  );
 }
 
 export function RefsPage() {

@@ -34,7 +34,7 @@ export function RefCommitRow({
   return (
     <tr>
       <td className="ref-name">
-        <Link to={treePath(repoUrl, reference.oid)}>{name}</Link>
+        <Link to={treePath(repoUrl, name)}>{name}</Link>
       </td>
       {state.status === "success" ? (
         <>
