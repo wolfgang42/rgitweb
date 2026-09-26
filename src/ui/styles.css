@@ -217,6 +217,12 @@ th {
   word-break: break-all;
 }
 
+.blob-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 .tabs {
   display: flex;
   gap: 1rem;

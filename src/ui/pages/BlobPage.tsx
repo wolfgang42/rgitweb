@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 
+import mime from "mime/lite";
 import { useParams } from "react-router";
 
 import { NotFoundError, type Repository } from "../../git/index.js";
@@ -72,6 +73,7 @@ export function BlobPage() {
   const { bytes: data } = state.data;
   const binary = isBinary(data);
   const markdown = isMarkdown(filename);
+  const image = mime.getType(filename)?.startsWith("image/") ?? false;
 
   return (
     <div>
@@ -101,7 +103,9 @@ export function BlobPage() {
           </>
         )}
       </p>
-      {binary ? (
+      {image && objectUrl ? (
+        <img className="blob-image" src={objectUrl} alt={filename} />
+      ) : binary ? (
         <p className="hint">Binary file — use the raw link to download.</p>
       ) : (
         (() => {
