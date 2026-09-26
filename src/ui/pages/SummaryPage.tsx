@@ -4,27 +4,22 @@ import { ErrorPanel } from "../components/ErrorPanel.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { OidLink } from "../components/OidLink.js";
 import { Readme } from "../components/Readme.js";
-import { RelativeDate } from "../components/RelativeDate.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
 import { logPath, refsPath, repoDisplayName } from "../paths.js";
 import { useRepo } from "../repoOutletContext.js";
 import { summaryLine } from "../utils/format.js";
 import {
-  type Commit,
   type Head,
   NotFoundError,
   type Ref,
   type Repository,
 } from "../../git/index.js";
 
-const RECENT_COMMIT_COUNT = 10;
-
 interface SummaryData {
   readonly head: Head;
-  readonly headTreeOid: string;
+  readonly headCommit: Awaited<ReturnType<Repository["getCommit"]>>;
   readonly refs: readonly Ref[];
-  readonly commits: readonly Commit[];
   readonly description: string | undefined;
 }
 
@@ -35,11 +30,10 @@ const DEFAULT_DESCRIPTIONS = new Set([
 
 async function loadSummary(repository: Repository): Promise<SummaryData> {
   const head = await repository.head();
-  const [refs, commits] = await Promise.all([
+  const [refs, headCommit] = await Promise.all([
     repository.refs(),
-    collectCommits(repository, head.oid, RECENT_COMMIT_COUNT),
+    repository.getCommit(head.oid),
   ]);
-  const headCommit = await repository.getCommit(head.oid);
   let description: string | undefined;
   try {
     const text = await repository.description();
@@ -52,22 +46,7 @@ async function loadSummary(repository: Repository): Promise<SummaryData> {
       throw error;
     }
   }
-  return { head, headTreeOid: headCommit.tree, refs, commits, description };
-}
-
-async function collectCommits(
-  repository: Repository,
-  start: string,
-  limit: number,
-): Promise<Commit[]> {
-  const out: Commit[] = [];
-  for await (const commit of repository.log(start, { limit })) {
-    out.push(commit);
-    if (out.length >= limit) {
-      break;
-    }
-  }
-  return out;
+  return { head, headCommit, refs, description };
 }
 
 export function SummaryPage() {
@@ -82,7 +61,7 @@ export function SummaryPage() {
     return <ErrorPanel error={state.error} />;
   }
 
-  const { refs, commits } = state.data;
+  const { refs, headCommit } = state.data;
   const branches = refs.filter((ref) => ref.name.startsWith("refs/heads/"));
   const tags = refs.filter((ref) => ref.name.startsWith("refs/tags/"));
   const headName =
@@ -98,29 +77,14 @@ export function SummaryPage() {
           {branches.length} branches, {tags.length} tags
         </Link>
       </p>
-      <section>
-        <h2>Recent commits</h2>
-        <table className="log-table">
-          <tbody>
-            {commits.map((commit) => (
-              <tr key={commit.oid}>
-                <td>
-                  <OidLink repoUrl={url} oid={commit.oid} />
-                </td>
-                <td className="summary">{summaryLine(commit.message)}</td>
-                <td>{commit.author.name}</td>
-                <td>
-                  <RelativeDate date={commit.author.date} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p>
-          <Link to={logPath(url, defaultRev)}>full log →</Link>
+      <div className="section-heading">
+        <p className="summary">
+          <OidLink repoUrl={url} oid={headCommit.oid} />{" "}
+          {summaryLine(headCommit.message)}
         </p>
-      </section>
-      <Readme repository={repository} treeOid={state.data.headTreeOid} />
+        <Link to={logPath(url, defaultRev)}>view log →</Link>
+      </div>
+      <Readme repository={repository} treeOid={headCommit.tree} />
     </div>
   );
 }
