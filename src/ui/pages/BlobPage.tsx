@@ -77,7 +77,13 @@ export function BlobPage() {
 
   return (
     <div>
-      <Breadcrumbs repoUrl={url} rev={rev} path={path} isTree={false} />
+      <Breadcrumbs
+        repoUrl={url}
+        repository={repository}
+        rev={rev}
+        path={path}
+        isTree={false}
+      />
       <p>
         {formatBytes(data.length)}
         {objectUrl && (

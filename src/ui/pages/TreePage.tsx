@@ -102,7 +102,13 @@ export function TreePage() {
 
   return (
     <div>
-      {path && <Breadcrumbs repoUrl={url} rev={rev} path={path} isTree />}
+      <Breadcrumbs
+        repoUrl={url}
+        repository={repository}
+        rev={rev}
+        path={path}
+        isTree
+      />
       {!path && (
         <div className="panel tree-commit">
           <div className="summary">

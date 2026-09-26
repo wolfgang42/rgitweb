@@ -242,6 +242,13 @@ th {
 
 .breadcrumbs {
   font-family: var(--font-mono);
+}
+
+.path-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
@@ -251,6 +258,97 @@ th {
 
 .breadcrumbs a {
   text-decoration: none;
+}
+
+.ref-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(22rem, calc(100vw - 3rem));
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+  anchor-name: --ref-picker-trigger;
+}
+
+.ref-picker-trigger span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ref-picker-trigger span:last-child {
+  color: var(--fg-muted);
+}
+
+.ref-picker-popover {
+  position: fixed;
+  inset: auto;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: min(24rem, 70vh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0.35rem 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
+}
+
+@supports (position-area: bottom) {
+  .ref-picker-popover {
+    position-anchor: --ref-picker-trigger;
+    position-area: bottom span-right;
+    align-self: start;
+    margin-block-start: 0.35rem;
+    position-try-fallbacks: flip-block;
+  }
+}
+
+.ref-picker-group + .ref-picker-group {
+  border-top: 1px solid var(--border);
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+}
+
+.ref-picker-group h2 {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  color: var(--fg-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ref-picker-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ref-picker-group a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.3rem 0.75rem;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.ref-picker-group a:hover,
+.ref-picker-group a[aria-current="page"] {
+  background: var(--accent);
+}
+
+.ref-picker-message {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
 }
 
 .tree-table .mode {
