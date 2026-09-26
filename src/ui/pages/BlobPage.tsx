@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 
 import { useParams } from "react-router";
 
@@ -9,6 +9,7 @@ import { HighlightedCode } from "../components/HighlightedCode.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
+import { useObjectUrl } from "../hooks/useObjectUrl.js";
 import { decodeSplatPath, repoDisplayName } from "../paths.js";
 import { useRepo } from "../repoOutletContext.js";
 import { isBinary } from "../utils/binary.js";
@@ -40,15 +41,6 @@ async function loadBlob(
   return { path, bytes };
 }
 
-function useObjectUrl(bytes: Uint8Array | undefined): string | undefined {
-  return useMemo(() => {
-    if (!bytes) {
-      return;
-    }
-    return URL.createObjectURL(new Blob([new Uint8Array(bytes)]));
-  }, [bytes]);
-}
-
 export function BlobPage() {
   const { repository, url } = useRepo();
   const { ref: routeRev, "*": splat } = useParams<{
@@ -69,13 +61,6 @@ export function BlobPage() {
 
   const bytes = state.status === "success" ? state.data.bytes : undefined;
   const objectUrl = useObjectUrl(bytes);
-  useEffect(() => {
-    return () => {
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
-    };
-  }, [objectUrl]);
 
   if (state.status === "loading") {
     return <LoadingPanel />;
