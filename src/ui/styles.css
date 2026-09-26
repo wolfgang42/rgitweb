@@ -243,6 +243,9 @@ th {
 .breadcrumbs {
   font-family: var(--font-mono);
   margin-bottom: 1rem;
+}
+
+.breadcrumbs-separator {
   color: var(--fg-muted);
 }
 

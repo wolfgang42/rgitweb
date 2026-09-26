@@ -22,11 +22,13 @@ export function Breadcrumbs({
         const isLast = index === segments.length - 1;
         return (
           <span key={segmentPath}>
-            {" / "}
+            <span className="breadcrumbs-separator">{" / "}</span>
             {isLast ? (
               <>
                 <span>{segment}</span>
-                {isTree && " /"}
+                {isTree && (
+                  <span className="breadcrumbs-separator">{" /"}</span>
+                )}
               </>
             ) : (
               <Link to={treePath(repoUrl, rev, segmentPath)}>{segment}</Link>
