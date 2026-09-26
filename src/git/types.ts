@@ -17,6 +17,12 @@ export type ObjectType = (typeof ObjectTypes)[number];
 /** A 40-character lowercase hex SHA-1 object id. */
 export type Oid = string;
 
+/** Raw config value; null represents a key written without `=`. */
+export type ConfigValue = string | null;
+
+/** Parsed Git config keyed by canonical variable name, retaining all values. */
+export type GitConfig = ReadonlyMap<string, readonly ConfigValue[]>;
+
 export interface GitObject {
   readonly oid: Oid;
   readonly type: ObjectType;
@@ -95,6 +101,8 @@ export interface Repository {
   head(): Promise<Head>;
   /** All refs advertised in info/refs plus any loose refs found. */
   refs(): Promise<readonly Ref[]>;
+  /** Parsed config, keyed by canonical variable name. Undefined if config is unavailable. */
+  config(): Promise<GitConfig | undefined>;
   /** The plain-text project description from git/description. */
   description(): Promise<string>;
 

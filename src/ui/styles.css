@@ -156,6 +156,10 @@ th {
   white-space: nowrap;
 }
 
+.remote-url {
+  overflow-wrap: anywhere;
+}
+
 .hint {
   color: var(--fg-muted);
   font-size: 0.9em;

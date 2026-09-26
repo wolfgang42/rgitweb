@@ -2,7 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 
 import { openRepository } from "../../src/git/index.js";
 import { RepositoryAccessError } from "../../src/git/types.js";
-import { createFileFetch } from "../fixtures/fileFetch.js";
+import { createFileFetch, requestUrl } from "../fixtures/fileFetch.js";
 import { buildFixtureRepo, runGit } from "../fixtures/setup.js";
 import { FIXTURE_URL, openFixtureRepository } from "../helpers.js";
 
@@ -41,6 +41,42 @@ describe("openRepository", () => {
     await expect(repo.description()).resolves.toBe(
       "A repository for testing rgitweb.\n",
     );
+  });
+
+  it("reads the complete parsed repository config", async () => {
+    const fixture = await buildFixtureRepo();
+    const fileFetch = createFileFetch(fixture.repoDir);
+    const fetchImpl: typeof globalThis.fetch = (input, init) => {
+      if (new URL(requestUrl(input)).pathname.endsWith("/config")) {
+        return Promise.resolve(
+          new Response(
+            '[remote "origin"]\n\turl = https://example.com/owner/project.git\n',
+          ),
+        );
+      }
+      return fileFetch(input, init);
+    };
+    const repo = await openRepository(FIXTURE_URL, { fetch: fetchImpl });
+
+    await expect(repo.config()).resolves.toEqual(
+      new Map([
+        ["remote.origin.url", ["https://example.com/owner/project.git"]],
+      ]),
+    );
+  });
+
+  it("returns undefined when the config file is not published", async () => {
+    const fixture = await buildFixtureRepo();
+    const fileFetch = createFileFetch(fixture.repoDir);
+    const fetchImpl: typeof globalThis.fetch = (input, init) => {
+      if (new URL(requestUrl(input)).pathname.endsWith("/config")) {
+        return Promise.resolve(new Response(null, { status: 404 }));
+      }
+      return fileFetch(input, init);
+    };
+    const repo = await openRepository(FIXTURE_URL, { fetch: fetchImpl });
+
+    await expect(repo.config()).resolves.toBeUndefined();
   });
 
   it("throws RepositoryAccessError with a hint on a 404 (non-git) url", async () => {

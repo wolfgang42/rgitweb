@@ -1,6 +1,7 @@
 /** Ties transport + refs + loose + pack + object parsing together into a Repository. */
 
 import { definite } from "./assert.js";
+import { fetchGitConfig } from "./config.js";
 import { readLooseObject, type RawObject } from "./loose.js";
 import { parseCommit, parseTag, parseTree, verifyOid } from "./objects.js";
 import { findObjectInPacks } from "./pack.js";
@@ -14,6 +15,7 @@ import { type Transport } from "./transport.js";
 import {
   type AnnotatedTag,
   type Commit,
+  type GitConfig,
   type GitObject,
   type Head,
   type LogOptions,
@@ -31,6 +33,7 @@ export function createRepositoryImpl(
   transport: Transport,
 ): Repository {
   let refsPromise: Promise<Ref[]> | undefined;
+  let configPromise: Promise<GitConfig | undefined> | undefined;
   let headPromise: Promise<Head> | undefined;
   let packNamesPromise: Promise<string[]> | undefined;
 
@@ -62,6 +65,11 @@ export function createRepositoryImpl(
   function getRefs(): Promise<Ref[]> {
     refsPromise ??= fetchInfoRefs(transport, baseUrl);
     return refsPromise;
+  }
+
+  function getConfig(): Promise<GitConfig | undefined> {
+    configPromise ??= fetchGitConfig(transport, baseUrl);
+    return configPromise;
   }
 
   function getHead(): Promise<Head> {
@@ -279,6 +287,7 @@ export function createRepositoryImpl(
     url: baseUrl,
     head: getHead,
     refs: getRefs,
+    config: getConfig,
     description,
     resolve,
     getObject: getRawObject,
