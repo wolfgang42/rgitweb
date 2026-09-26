@@ -83,8 +83,10 @@ export function BlobPage() {
         {objectUrl && (
           <>
             {" — "}
+            <a href={objectUrl}>raw</a>
+            {" — "}
             <a href={objectUrl} download={filename}>
-              raw
+              download
             </a>
           </>
         )}
