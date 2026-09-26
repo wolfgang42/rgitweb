@@ -6,10 +6,12 @@ export function Breadcrumbs({
   repoUrl,
   rev,
   path,
+  isTree,
 }: {
   readonly repoUrl: string;
   readonly rev: string;
   readonly path: string;
+  readonly isTree: boolean;
 }) {
   const segments = path.split("/").filter((segment) => segment.length > 0);
   return (
@@ -22,7 +24,10 @@ export function Breadcrumbs({
           <span key={segmentPath}>
             {" / "}
             {isLast ? (
-              <span>{segment}</span>
+              <>
+                <span>{segment}</span>
+                {isTree && " /"}
+              </>
             ) : (
               <Link to={treePath(repoUrl, rev, segmentPath)}>{segment}</Link>
             )}
