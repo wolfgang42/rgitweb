@@ -4,11 +4,10 @@ import { ErrorPanel } from "../components/ErrorPanel.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { OidLink } from "../components/OidLink.js";
 import { Readme } from "../components/Readme.js";
-import { RefCommitRow } from "../components/RefCommitRow.js";
 import { RelativeDate } from "../components/RelativeDate.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
-import { logPath, repoDisplayName } from "../paths.js";
+import { logPath, refsPath, repoDisplayName } from "../paths.js";
 import { useRepo } from "../repoOutletContext.js";
 import { summaryLine } from "../utils/format.js";
 import {
@@ -86,40 +85,19 @@ export function SummaryPage() {
   const { refs, commits } = state.data;
   const branches = refs.filter((ref) => ref.name.startsWith("refs/heads/"));
   const tags = refs.filter((ref) => ref.name.startsWith("refs/tags/"));
+  const headName =
+    state.data.head.symref?.replace(/^refs\/heads\//, "") ??
+    state.data.head.oid;
 
   return (
     <div>
       {state.data.description && <p>{state.data.description}</p>}
-      <section>
-        <h2>Branches</h2>
-        <table className="ref-table">
-          <tbody>
-            {branches.map((ref) => (
-              <RefCommitRow
-                key={ref.name}
-                repoUrl={url}
-                repository={repository}
-                reference={ref}
-              />
-            ))}
-          </tbody>
-        </table>
-      </section>
-      <section>
-        <h2>Tags</h2>
-        <table className="ref-table">
-          <tbody>
-            {tags.map((ref) => (
-              <RefCommitRow
-                key={ref.name}
-                repoUrl={url}
-                repository={repository}
-                reference={ref}
-              />
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <p>
+        <strong>{headName}</strong> -{" "}
+        <Link to={refsPath(url)}>
+          {branches.length} branches, {tags.length} tags
+        </Link>
+      </p>
       <section>
         <h2>Recent commits</h2>
         <table className="log-table">
