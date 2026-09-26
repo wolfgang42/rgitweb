@@ -1,7 +1,9 @@
 import { useEffect, useState, type SyntheticEvent } from "react";
 
 import { structuredPatch } from "diff";
+import { Link } from "react-router";
 
+import { blobPath } from "../paths.js";
 import { isBinary } from "../utils/binary.js";
 import { type Repository } from "../../git/index.js";
 import { type FileChange } from "../utils/treeDiff.js";
@@ -83,10 +85,14 @@ function statusLabel(change: FileChange): string {
 }
 
 export function FileDiff({
+  repoUrl,
+  revision,
   repository,
   change,
   defaultOpen,
 }: {
+  readonly repoUrl: string;
+  readonly revision: string;
   readonly repository: Repository;
   readonly change: FileChange;
   readonly defaultOpen: boolean;
@@ -132,6 +138,14 @@ export function FileDiff({
         </span>
         <span className="path">{change.path}</span>
         {change.isSubmodule && <span className="hint"> (submodule)</span>}
+        {!change.isSubmodule && (
+          <Link
+            className="view-file"
+            to={blobPath(repoUrl, revision, change.path)}
+          >
+            view file →
+          </Link>
+        )}
       </summary>
       {opened && (
         <div className="file-diff-body">

@@ -299,7 +299,14 @@ th {
 }
 
 .file-diff .path {
+  flex: 1;
+  min-width: 0;
   word-break: break-all;
+}
+
+.file-diff .view-file {
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .change-status {

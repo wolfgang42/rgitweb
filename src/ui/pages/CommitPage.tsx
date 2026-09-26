@@ -127,6 +127,12 @@ export function CommitPage() {
           {changes.map((change, index) => (
             <FileDiff
               key={change.path}
+              repoUrl={url}
+              revision={
+                change.status === "removed"
+                  ? (parents[0] ?? commit).oid
+                  : commit.oid
+              }
               repository={repository}
               change={change}
               defaultOpen={index < AUTO_EXPAND_COUNT}
