@@ -10,6 +10,7 @@ import { ErrorPanel } from "../components/ErrorPanel.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { OidLink } from "../components/OidLink.js";
 import { Readme } from "../components/Readme.js";
+import { RepoDescription } from "../components/RepoDescription.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
 import {
@@ -78,7 +79,7 @@ function sortEntries(
 }
 
 export function TreePage() {
-  const { repository, url } = useRepo();
+  const { repository, url, defaultRev } = useRepo();
   const { ref: routeRev, "*": splat } = useParams<{
     ref: string;
     "*": string;
@@ -100,8 +101,11 @@ export function TreePage() {
     return <ErrorPanel error={state.error} />;
   }
 
+  const isRootOfHead = !path && rev === defaultRev;
+
   return (
     <div>
+      {isRootOfHead && <RepoDescription repository={repository} />}
       <Breadcrumbs
         repoUrl={url}
         repository={repository}
