@@ -8,8 +8,12 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
 import { repoDisplayName, repoRoot } from "../paths.js";
 
 export function StartPage() {
-  useDocumentTitle("rgitweb");
   const state = useAsync(loadConfig, []);
+  const siteName =
+    state.status === "success"
+      ? (state.data?.siteName ?? "rgitweb")
+      : "rgitweb";
+  useDocumentTitle(siteName);
   const featuredRepos =
     state.status === "success" ? state.data?.featuredRepos : undefined;
   const homeHtml =
