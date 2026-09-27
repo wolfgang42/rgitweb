@@ -10,20 +10,12 @@ import { repoRoot } from "../paths.js";
 export function StartPage() {
   useDocumentTitle("rgitweb");
   const state = useAsync(loadConfig, []);
+  const homeHtml =
+    state.status === "success" ? state.data?.homeHtml : undefined;
 
   return (
     <div className="page start-page">
-      <h1>rgitweb</h1>
-      <p>
-        A fully static, client-side Git repository browser — no server-side
-        logic involved. It reads a repository's dumb-HTTP layout (
-        <code>info/refs</code>, loose objects, and pack files fetched with HTTP
-        Range requests) straight from the browser, so the host must serve it
-        over CORS (including{" "}
-        <code>Access-Control-Expose-Headers: Accept-Ranges, Content-Range</code>
-        ). Most Git hosts don't, which is why this page lists only repositories
-        configured for this deployment rather than taking an arbitrary URL.
-      </p>
+      {homeHtml && <div dangerouslySetInnerHTML={{ __html: homeHtml }} />}
       {state.status === "loading" ? (
         <LoadingPanel />
       ) : state.status === "error" ? (

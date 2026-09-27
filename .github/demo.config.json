@@ -4,5 +4,6 @@
       "name": "rgitweb (this site's own history)",
       "url": "./git"
     }
-  ]
+  ],
+  "homeHtml": "<h1>rgitweb</h1>\n<p>\n  A fully static, client-side Git repository browser — no server-side\n  logic involved. It reads a repository's dumb-HTTP layout (<code>info/refs</code>,\n  loose objects, and pack files fetched with HTTP Range requests) straight from\n  the browser, so the host must serve it over CORS (including\n  <code>Access-Control-Expose-Headers: Accept-Ranges, Content-Range</code>).\n  Most Git hosts don't, which is why this page lists only repositories\n  configured for this deployment rather than taking an arbitrary URL.\n</p>"
 }
