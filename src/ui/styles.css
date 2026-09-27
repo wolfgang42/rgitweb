@@ -208,6 +208,10 @@ th {
   color: inherit;
 }
 
+.repo-header h1 .repo-site-link {
+  color: var(--link);
+}
+
 .repo-url {
   margin: 0 0 0.75rem;
   color: var(--fg-muted);

@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet, useLocation, useParams } from "react-router";
 
 import { LoadingPanel } from "../components/LoadingPanel.js";
+import { loadConfig } from "../config.js";
 import { ErrorBoundary } from "../components/ErrorBoundary.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { refsPath, repoDisplayName, repoRoot } from "../paths.js";
@@ -41,6 +42,11 @@ function defaultRevFromHead(
 export function RepoLayout() {
   const { repoUrl: encodedRepoUrl } = useParams<{ repoUrl: string }>();
   const { pathname } = useLocation();
+  const siteConfig = useAsync(loadConfig, []);
+  const siteName =
+    siteConfig.status === "success"
+      ? (siteConfig.data?.siteName ?? "rgitweb")
+      : "rgitweb";
   // React Router already fully decodes matched path params, including
   // literal slashes that were percent-encoded to keep the URL to one segment.
   const repoUrl = encodedRepoUrl ?? "";
@@ -76,6 +82,10 @@ export function RepoLayout() {
     <div className="page repo-page">
       <header className="repo-header">
         <h1>
+          <Link className="repo-site-link" to="/">
+            {siteName}
+          </Link>
+          <span className="breadcrumbs-separator">{" / "}</span>
           <Link to={repoRoot(repoUrl)}>{repoDisplayName(repoUrl)}</Link>
         </h1>
         <p className="repo-url">
