@@ -195,8 +195,7 @@ th {
 
 .repo-header {
   border-bottom: 2px solid var(--border);
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .repo-header h1 {
