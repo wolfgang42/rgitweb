@@ -16,10 +16,6 @@ export function repoRoot(repoUrl: string): string {
   return `/r/${encodeURIComponent(repoUrl)}`;
 }
 
-export function summaryPath(repoUrl: string): string {
-  return `${repoRoot(repoUrl)}/summary`;
-}
-
 export function refsPath(repoUrl: string): string {
   return `${repoRoot(repoUrl)}/refs`;
 }

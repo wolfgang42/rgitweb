@@ -3,13 +3,7 @@ import { Link, NavLink, Outlet, useParams } from "react-router";
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { ErrorBoundary } from "../components/ErrorBoundary.js";
 import { useAsync } from "../hooks/useAsync.js";
-import {
-  logPath,
-  refsPath,
-  repoDisplayName,
-  summaryPath,
-  treePath,
-} from "../paths.js";
+import { logPath, refsPath, repoDisplayName, repoRoot } from "../paths.js";
 import { getRepository } from "../repoCache.js";
 import { type RepoOutletContext } from "../repoOutletContext.js";
 
@@ -81,7 +75,7 @@ export function RepoLayout() {
     <div className="page repo-page">
       <header className="repo-header">
         <h1>
-          <Link to={summaryPath(repoUrl)}>{repoDisplayName(repoUrl)}</Link>
+          <Link to={repoRoot(repoUrl)}>{repoDisplayName(repoUrl)}</Link>
         </h1>
         <p className="repo-url">
           git clone {new URL(repoUrl, globalThis.location.href).href}
@@ -93,12 +87,11 @@ export function RepoLayout() {
           )}
         </p>
         <nav className="tabs">
-          <NavLink to={summaryPath(repoUrl)} end>
-            summary
+          <NavLink to={repoRoot(repoUrl)} end>
+            tree
           </NavLink>
           <NavLink to={refsPath(repoUrl)}>refs</NavLink>
           <NavLink to={logPath(repoUrl, context.defaultRev)}>log</NavLink>
-          <NavLink to={treePath(repoUrl, context.defaultRev)}>tree</NavLink>
         </nav>
       </header>
       <main>

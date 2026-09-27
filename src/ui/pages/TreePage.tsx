@@ -84,7 +84,7 @@ export function TreePage() {
     ref: string;
     "*": string;
   }>();
-  const rev = routeRev ?? "";
+  const rev = routeRev ?? defaultRev;
   const path = decodeSplatPath(splat);
 
   useDocumentTitle(`${repoDisplayName(url)} — tree: ${path || "/"}`);

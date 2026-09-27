@@ -6,7 +6,6 @@ import { LogPage } from "./pages/LogPage.js";
 import { RefsPage } from "./pages/RefsPage.js";
 import { RepoLayout } from "./pages/RepoLayout.js";
 import { StartPage } from "./pages/StartPage.js";
-import { SummaryPage } from "./pages/SummaryPage.js";
 import { TreePage } from "./pages/TreePage.js";
 import "./styles.css";
 
@@ -16,8 +15,8 @@ export function App() {
       <Routes>
         <Route path="/" element={<StartPage />} />
         <Route path="/r/:repoUrl" element={<RepoLayout />}>
-          <Route index element={<Navigate to="summary" replace />} />
-          <Route path="summary" element={<SummaryPage />} />
+          <Route index element={<TreePage />} />
+          <Route path="summary" element={<Navigate to=".." replace />} />
           <Route path="refs" element={<RefsPage />} />
           <Route path="log/:ref" element={<LogPage />} />
           <Route path="commit/:oid" element={<CommitPage />} />
