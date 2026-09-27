@@ -36,6 +36,9 @@ export function StartPage() {
                 <Link to={repoRoot(repo.url)}>
                   {repo.name ?? repoDisplayName(repo.url)}
                 </Link>
+                {repo.description && (
+                  <p className="featured-description">{repo.description}</p>
+                )}
               </li>
             ))}
           </ul>

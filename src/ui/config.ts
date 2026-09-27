@@ -2,6 +2,7 @@
 export interface FeaturedRepo {
   readonly url: string;
   readonly name?: string;
+  readonly description?: string;
 }
 
 /** Runtime site configuration loaded from the URL in `VITE_CONFIG_PATH`. */
