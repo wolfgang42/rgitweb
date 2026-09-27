@@ -3,6 +3,7 @@ import { Component, type ReactNode } from "react";
 import { ErrorPanel } from "./ErrorPanel.js";
 
 interface ErrorBoundaryProps {
+  readonly isRoot?: boolean;
   readonly children: ReactNode;
 }
 
@@ -22,10 +23,12 @@ export class ErrorBoundary extends Component<
 
   override render() {
     if (this.state.error !== null) {
-      return (
+      return this.props.isRoot ? (
         <div className="page">
           <ErrorPanel error={this.state.error} />
         </div>
+      ) : (
+        <ErrorPanel error={this.state.error} />
       );
     }
     return this.props.children;

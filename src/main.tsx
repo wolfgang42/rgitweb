@@ -11,7 +11,7 @@ if (!root) {
 }
 createRoot(root).render(
   <StrictMode>
-    <ErrorBoundary>
+    <ErrorBoundary isRoot>
       <App />
     </ErrorBoundary>
   </StrictMode>,

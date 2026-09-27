@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet, useParams } from "react-router";
 
 import { LoadingPanel } from "../components/LoadingPanel.js";
+import { ErrorBoundary } from "../components/ErrorBoundary.js";
 import { useAsync } from "../hooks/useAsync.js";
 import {
   logPath,
@@ -101,7 +102,9 @@ export function RepoLayout() {
         </nav>
       </header>
       <main>
-        <Outlet context={context} />
+        <ErrorBoundary>
+          <Outlet context={context} />
+        </ErrorBoundary>
       </main>
     </div>
   );
