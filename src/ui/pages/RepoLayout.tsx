@@ -1,9 +1,9 @@
-import { Link, NavLink, Outlet, useParams } from "react-router";
+import { Link, NavLink, Outlet, useLocation, useParams } from "react-router";
 
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { ErrorBoundary } from "../components/ErrorBoundary.js";
 import { useAsync } from "../hooks/useAsync.js";
-import { logPath, refsPath, repoDisplayName, repoRoot } from "../paths.js";
+import { refsPath, repoDisplayName, repoRoot } from "../paths.js";
 import { getRepository } from "../repoCache.js";
 import { type RepoOutletContext } from "../repoOutletContext.js";
 
@@ -40,6 +40,7 @@ function defaultRevFromHead(
 
 export function RepoLayout() {
   const { repoUrl: encodedRepoUrl } = useParams<{ repoUrl: string }>();
+  const { pathname } = useLocation();
   // React Router already fully decodes matched path params, including
   // literal slashes that were percent-encoded to keep the URL to one segment.
   const repoUrl = encodedRepoUrl ?? "";
@@ -87,11 +88,14 @@ export function RepoLayout() {
           )}
         </p>
         <nav className="tabs">
-          <NavLink to={repoRoot(repoUrl)} end>
-            tree
-          </NavLink>
+          <Link
+            to={repoRoot(repoUrl)}
+            className={pathname === refsPath(repoUrl) ? undefined : "active"}
+            aria-current={pathname === refsPath(repoUrl) ? undefined : "page"}
+          >
+            code
+          </Link>
           <NavLink to={refsPath(repoUrl)}>refs</NavLink>
-          <NavLink to={logPath(repoUrl, context.defaultRev)}>log</NavLink>
         </nav>
       </header>
       <main>
