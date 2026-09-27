@@ -1,7 +1,7 @@
 /** A repository shown in the start page's featured-repositories list. */
 export interface FeaturedRepo {
-  readonly name: string;
   readonly url: string;
+  readonly name?: string;
 }
 
 /** Runtime site configuration loaded from the URL in `VITE_CONFIG_PATH`. */

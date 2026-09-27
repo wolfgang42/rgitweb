@@ -5,7 +5,7 @@ import { LoadingPanel } from "../components/LoadingPanel.js";
 import { loadConfig } from "../config.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
-import { repoRoot } from "../paths.js";
+import { repoDisplayName, repoRoot } from "../paths.js";
 
 export function StartPage() {
   useDocumentTitle("rgitweb");
@@ -33,7 +33,9 @@ export function StartPage() {
           <ul className="featured-list">
             {featuredRepos.map((repo) => (
               <li key={repo.url}>
-                <Link to={repoRoot(repo.url)}>{repo.name}</Link>
+                <Link to={repoRoot(repo.url)}>
+                  {repo.name ?? repoDisplayName(repo.url)}
+                </Link>
               </li>
             ))}
           </ul>
