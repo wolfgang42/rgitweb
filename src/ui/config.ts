@@ -6,7 +6,8 @@ export interface FeaturedRepo {
 
 /** Runtime site configuration loaded from the URL in `VITE_CONFIG_PATH`. */
 export interface Config {
-  readonly featuredRepos: readonly FeaturedRepo[];
+  /** Omit to show the setup message; an empty array suppresses it. */
+  readonly featuredRepos?: readonly FeaturedRepo[];
   readonly homeHtml?: string;
 }
 

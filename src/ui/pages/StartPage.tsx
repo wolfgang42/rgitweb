@@ -10,6 +10,8 @@ import { repoRoot } from "../paths.js";
 export function StartPage() {
   useDocumentTitle("rgitweb");
   const state = useAsync(loadConfig, []);
+  const featuredRepos =
+    state.status === "success" ? state.data?.featuredRepos : undefined;
   const homeHtml =
     state.status === "success" ? state.data?.homeHtml : undefined;
 
@@ -20,23 +22,23 @@ export function StartPage() {
         <LoadingPanel />
       ) : state.status === "error" ? (
         <ErrorPanel error={state.error} />
-      ) : state.data?.featuredRepos.length ? (
+      ) : featuredRepos === undefined ? (
+        <p>
+          No repositories are configured for this deployment. See{" "}
+          <code>src/ui/config.ts</code> in the rgitweb source to add one.
+        </p>
+      ) : featuredRepos.length > 0 ? (
         <section>
           <h2>Repositories</h2>
           <ul className="featured-list">
-            {state.data.featuredRepos.map((repo) => (
+            {featuredRepos.map((repo) => (
               <li key={repo.url}>
                 <Link to={repoRoot(repo.url)}>{repo.name}</Link>
               </li>
             ))}
           </ul>
         </section>
-      ) : (
-        <p>
-          No repositories are configured for this deployment. See{" "}
-          <code>src/ui/config.ts</code> in the rgitweb source to add one.
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }
