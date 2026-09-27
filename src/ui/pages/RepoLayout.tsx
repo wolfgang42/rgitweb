@@ -1,6 +1,5 @@
 import { Link, NavLink, Outlet, useParams } from "react-router";
 
-import { ErrorPanel } from "../components/ErrorPanel.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { useAsync } from "../hooks/useAsync.js";
 import {
@@ -70,16 +69,7 @@ export function RepoLayout() {
       </div>
     );
   }
-  if (state.status === "error") {
-    return (
-      <div className="page">
-        <p>
-          <Link to="/">← back</Link>
-        </p>
-        <ErrorPanel error={state.error} />
-      </div>
-    );
-  }
+  if (state.status === "error") throw state.error;
 
   const context: RepoOutletContext = {
     repository: state.data.repository,
