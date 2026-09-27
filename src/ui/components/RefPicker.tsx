@@ -4,7 +4,7 @@ import { Link } from "react-router";
 
 import { type Ref, type Repository } from "../../git/index.js";
 import { useAsync } from "../hooks/useAsync.js";
-import { treePath } from "../paths.js";
+import { logPath, treePath } from "../paths.js";
 import { shortOid } from "../utils/format.js";
 
 function shortRefName(name: string): string {
@@ -20,11 +20,13 @@ export function RefPicker({
   repository,
   rev,
   path,
+  destination = "tree",
 }: {
   readonly repoUrl: string;
   readonly repository: Repository;
   readonly rev: string;
   readonly path: string;
+  readonly destination?: "tree" | "log";
 }) {
   const popoverId = useId();
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -56,7 +58,11 @@ export function RefPicker({
             return (
               <li key={reference.name}>
                 <Link
-                  to={treePath(repoUrl, reference.name, path)}
+                  to={
+                    destination === "log"
+                      ? logPath(repoUrl, reference.name, { path })
+                      : treePath(repoUrl, reference.name, path)
+                  }
                   aria-current={isCurrent ? "page" : undefined}
                   onClick={() => popoverRef.current?.hidePopover()}
                 >

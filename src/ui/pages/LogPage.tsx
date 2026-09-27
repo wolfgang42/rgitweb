@@ -3,6 +3,7 @@ import { useParams, useSearchParams, Link } from "react-router";
 import { ErrorPanel } from "../components/ErrorPanel.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
 import { OidLink } from "../components/OidLink.js";
+import { RefPicker } from "../components/RefPicker.js";
 import { RelativeDate } from "../components/RelativeDate.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
@@ -76,10 +77,13 @@ export function LogPage() {
 
   return (
     <div>
-      <h2>
-        Log: {rev}
-        {path && <span> — {path}</span>}
-      </h2>
+      <RefPicker
+        repoUrl={url}
+        repository={repository}
+        rev={rev}
+        path={path ?? ""}
+        destination="log"
+      />
       <table className="log-table">
         <tbody>
           {commits.map((commit) => (
