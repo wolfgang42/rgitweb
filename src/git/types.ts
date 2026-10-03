@@ -85,8 +85,6 @@ export interface Head {
 export interface LogOptions {
   /** Maximum number of commits to yield. */
   readonly limit?: number;
-  /** Restrict the walk to commits touching this path (slash-separated). */
-  readonly path?: string;
 }
 
 /**

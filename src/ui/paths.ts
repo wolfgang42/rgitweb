@@ -23,13 +23,10 @@ export function refsPath(repoUrl: string): string {
 export function logPath(
   repoUrl: string,
   rev: string,
-  options?: { readonly path?: string; readonly from?: string },
+  options?: { readonly from?: string },
 ): string {
   const base = `${repoRoot(repoUrl)}/log/${encodeURIComponent(rev)}`;
   const params = new URLSearchParams();
-  if (options?.path) {
-    params.set("path", options.path);
-  }
   if (options?.from) {
     params.set("from", options.from);
   }

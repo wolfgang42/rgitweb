@@ -53,45 +53,4 @@ describe("Repository.log", () => {
     ]).split("\n");
     expect(commit.parents).toEqual(expectedParents);
   });
-
-  it("path-filtered log only yields commits that changed the path", async () => {
-    const { repo, fixture } = await openFixtureRepository();
-    const headOid = runGit(["rev-parse", "HEAD"]);
-    const expectedOids = runGit([
-      "log",
-      "--date-order",
-      "--format=%H",
-      headOid,
-      "--",
-      fixture.changedFilePath,
-    ])
-      .split("\n")
-      .filter((l) => l.length > 0);
-
-    const commits = await collect(
-      repo.log(headOid, { path: fixture.changedFilePath }),
-    );
-    expect(commits.map((c) => c.oid)).toEqual(expectedOids);
-    expect(commits.length).toBeGreaterThan(1);
-  });
-
-  it("path-filtered log for a file only ever touched once returns a single commit", async () => {
-    const { repo, fixture } = await openFixtureRepository();
-    const headOid = runGit(["rev-parse", "HEAD"]);
-    const expectedOids = runGit([
-      "log",
-      "--date-order",
-      "--format=%H",
-      headOid,
-      "--",
-      fixture.symlinkPath,
-    ])
-      .split("\n")
-      .filter((l) => l.length > 0);
-
-    const commits = await collect(
-      repo.log(headOid, { path: fixture.symlinkPath }),
-    );
-    expect(commits.map((c) => c.oid)).toEqual(expectedOids);
-  });
 });

@@ -207,33 +207,11 @@ export function createRepositoryImpl(
     return entry;
   }
 
-  /** True if `commit` changed `path` relative to every one of its parents. */
-  async function commitTouchesPath(
-    commit: Commit,
-    path: string,
-  ): Promise<boolean> {
-    const entry = await pathEntry(commit.oid, path);
-    const oidHere = entry?.oid;
-
-    if (commit.parents.length === 0) {
-      return oidHere !== undefined;
-    }
-
-    for (const parentOid of commit.parents) {
-      const parentEntry = await pathEntry(parentOid, path);
-      if (parentEntry?.oid === oidHere) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   async function* log(
     start: Oid,
     options?: LogOptions,
   ): AsyncGenerator<Commit> {
     const limit = options?.limit;
-    const path = options?.path;
 
     const seen = new Set<Oid>();
     // Small sorted-by-committer-date-desc worklist. Repositories browsed by
@@ -267,14 +245,10 @@ export function createRepositoryImpl(
     while (pending.length > 0) {
       const commit = definite(pending.shift(), "worklist unexpectedly empty");
 
-      const include =
-        path === undefined || (await commitTouchesPath(commit, path));
-      if (include) {
-        yield commit;
-        yielded++;
-        if (limit !== undefined && yielded >= limit) {
-          return;
-        }
+      yield commit;
+      yielded++;
+      if (limit !== undefined && yielded >= limit) {
+        return;
       }
 
       for (const parentOid of commit.parents) {

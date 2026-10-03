@@ -22,13 +22,11 @@ async function fetchPage(
   repository: Repository,
   rev: string,
   from: Oid | undefined,
-  path: string | undefined,
 ): Promise<LogPageResult> {
   const startOid = from ?? (await resolveCommitOid(repository, rev));
   const commits: Commit[] = [];
   let skippedCursor = from === undefined;
   for await (const commit of repository.log(startOid, {
-    path,
     limit: PAGE_SIZE + 2,
   })) {
     if (!skippedCursor) {
@@ -51,16 +49,13 @@ export function LogPage() {
   const { ref: routeRev } = useParams<{ ref: string }>();
   const rev = routeRev ?? "";
   const [searchParams] = useSearchParams();
-  const path = searchParams.get("path") ?? undefined;
   const from = searchParams.get("from") ?? undefined;
 
-  useDocumentTitle(
-    `${repoDisplayName(url)} — log (${rev}${path ? `: ${path}` : ""})`,
-  );
+  useDocumentTitle(`${repoDisplayName(url)} — log (${rev})`);
 
   const state = useAsync(
-    () => fetchPage(repository, rev, from, path),
-    [repository, rev, from, path],
+    () => fetchPage(repository, rev, from),
+    [repository, rev, from],
   );
 
   if (state.status === "loading") {
@@ -79,7 +74,7 @@ export function LogPage() {
         repoUrl={url}
         repository={repository}
         rev={rev}
-        path={path ?? ""}
+        path=""
         destination="log"
       />
       <div className="log-commits">
@@ -90,7 +85,7 @@ export function LogPage() {
       {commits.length === 0 && <p>No commits.</p>}
       {hasMore && last && (
         <p>
-          <Link to={logPath(url, rev, { path, from: last.oid })}>older →</Link>
+          <Link to={logPath(url, rev, { from: last.oid })}>older →</Link>
         </p>
       )}
     </div>

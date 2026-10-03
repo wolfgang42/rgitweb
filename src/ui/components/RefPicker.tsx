@@ -60,7 +60,7 @@ export function RefPicker({
                 <Link
                   to={
                     destination === "log"
-                      ? logPath(repoUrl, reference.name, { path })
+                      ? logPath(repoUrl, reference.name)
                       : treePath(repoUrl, reference.name, path)
                   }
                   aria-current={isCurrent ? "page" : undefined}

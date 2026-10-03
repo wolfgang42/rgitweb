@@ -115,9 +115,7 @@ export function TreePage() {
       {!path && (
         <div className="panel tree-commit">
           <CommitSummary repoUrl={url} commit={state.data.commit} />
-          <Link to={logPath(url, rev, { path: path || undefined })}>
-            view log →
-          </Link>
+          <Link to={logPath(url, rev)}>view log →</Link>
         </div>
       )}
       <table className="tree-table">
