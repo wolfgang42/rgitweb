@@ -2,13 +2,14 @@ import { Link, useParams } from "react-router";
 
 import {
   NotFoundError,
+  type Commit,
   type Repository,
   type TreeEntry,
 } from "../../git/index.js";
 import { Breadcrumbs } from "../components/Breadcrumbs.js";
+import { CommitSummary } from "../components/CommitSummary.js";
 import { ErrorPanel } from "../components/ErrorPanel.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
-import { OidLink } from "../components/OidLink.js";
 import { Readme } from "../components/Readme.js";
 import { RepoDescription } from "../components/RepoDescription.js";
 import { useAsync } from "../hooks/useAsync.js";
@@ -21,7 +22,7 @@ import {
   treePath,
 } from "../paths.js";
 import { useRepo } from "../repoOutletContext.js";
-import { shortOid, summaryLine } from "../utils/format.js";
+import { shortOid } from "../utils/format.js";
 import { resolveCommitOid } from "../utils/resolveCommit.js";
 
 interface TreeEntryWithTarget extends TreeEntry {
@@ -29,8 +30,7 @@ interface TreeEntryWithTarget extends TreeEntry {
 }
 
 interface TreeData {
-  readonly commitOid: string;
-  readonly commitMessage: string;
+  readonly commit: Commit;
   readonly treeOid: string;
   readonly entries: readonly TreeEntryWithTarget[];
 }
@@ -60,8 +60,7 @@ async function loadTree(
     }),
   );
   return {
-    commitOid,
-    commitMessage: commit.message,
+    commit,
     treeOid: entry.oid,
     entries: sortEntries(withTargets),
   };
@@ -115,10 +114,7 @@ export function TreePage() {
       />
       {!path && (
         <div className="panel tree-commit">
-          <div className="summary">
-            <OidLink repoUrl={url} oid={state.data.commitOid} />{" "}
-            {summaryLine(state.data.commitMessage)}
-          </div>
+          <CommitSummary repoUrl={url} commit={state.data.commit} />
           <Link to={logPath(url, rev, { path: path || undefined })}>
             view log →
           </Link>

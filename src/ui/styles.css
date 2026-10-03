@@ -178,10 +178,62 @@ th {
 
 .tree-commit {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   background: var(--bg-alt);
+}
+
+.commit-summary {
+  padding: 0.5em 0;
+}
+
+.tree-commit .commit-summary {
+  padding: 0;
+}
+
+.commit-summary-details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.commit-summary-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.commit-summary-subject {
+  overflow-wrap: anywhere;
+}
+
+.commit-summary-more {
+  flex: none;
+  border: 1px solid var(--border);
+  background-color: var(--bg-alt);
+  border-radius: 0.25em;
+  margin-left: 0.5em;
+  padding: 0 0.4em;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.commit-summary-meta {
+  color: var(--fg-muted);
+  font-size: 0.9em;
+}
+
+.commit-summary-details[open] {
+  margin-bottom: 0.25rem;
+}
+
+.commit-summary-details pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+  padding: 0;
+}
+
+.tree-commit > a {
+  flex: none;
 }
 
 .panel-error {

@@ -1,15 +1,13 @@
 import { useParams, useSearchParams, Link } from "react-router";
 
 import { ErrorPanel } from "../components/ErrorPanel.js";
+import { CommitSummary } from "../components/CommitSummary.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
-import { OidLink } from "../components/OidLink.js";
 import { RefPicker } from "../components/RefPicker.js";
-import { RelativeDate } from "../components/RelativeDate.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
 import { logPath, repoDisplayName } from "../paths.js";
 import { useRepo } from "../repoOutletContext.js";
-import { summaryLine } from "../utils/format.js";
 import { resolveCommitOid } from "../utils/resolveCommit.js";
 import { type Commit, type Oid, type Repository } from "../../git/index.js";
 
@@ -84,22 +82,11 @@ export function LogPage() {
         path={path ?? ""}
         destination="log"
       />
-      <table className="log-table">
-        <tbody>
-          {commits.map((commit) => (
-            <tr key={commit.oid}>
-              <td>
-                <OidLink repoUrl={url} oid={commit.oid} />
-              </td>
-              <td className="summary">{summaryLine(commit.message)}</td>
-              <td>{commit.author.name}</td>
-              <td>
-                <RelativeDate date={commit.author.date} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="log-commits">
+        {commits.map((commit) => (
+          <CommitSummary key={commit.oid} repoUrl={url} commit={commit} />
+        ))}
+      </div>
       {commits.length === 0 && <p>No commits.</p>}
       {hasMore && last && (
         <p>
