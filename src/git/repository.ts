@@ -93,27 +93,21 @@ export function createRepositoryImpl(
       return cached;
     }
 
-    const loose = await readLooseObject(transport, baseUrl, oid);
-    if (loose) {
-      await verifyOid(oid, loose.type, loose.data);
-      const obj: GitObject = { oid, type: loose.type, data: loose.data };
-      cacheSet(obj);
-      return obj;
-    }
-
     const packNames = await getPackNames();
     const resolveRefDelta = (baseOid: Oid): Promise<RawObject> =>
       getRawObject(baseOid);
-    const packed = await findObjectInPacks(
-      transport,
-      baseUrl,
-      packNames,
-      oid,
-      resolveRefDelta,
-    );
-    if (packed) {
-      await verifyOid(oid, packed.type, packed.data);
-      const obj: GitObject = { oid, type: packed.type, data: packed.data };
+    // Most objects will probably be in pack files, so check those before loose objects.
+    const raw =
+      (await findObjectInPacks(
+        transport,
+        baseUrl,
+        packNames,
+        oid,
+        resolveRefDelta,
+      )) ?? (await readLooseObject(transport, baseUrl, oid));
+    if (raw) {
+      await verifyOid(oid, raw.type, raw.data);
+      const obj: GitObject = { oid, type: raw.type, data: raw.data };
       cacheSet(obj);
       return obj;
     }
