@@ -4,26 +4,25 @@ A fully static, client-side Git repository browser — a cgit replacement with
 no server-side rendering at all.
 
 Point it at the URL of a Git repository hosted as static files (the dumb-HTTP
-layout maintained by `git update-server-info`) and it browses branches, tags,
-history, commits with diffs, trees, and files — entirely in the browser.
+layout maintained by `git update-server-info`) to browse code, branches, tags,
+history, and commit details—entirely in the browser.
 
 ## How it works
 
-The app fetches exactly what a dumb-HTTP `git clone` would read, but lazily:
-small text files (`info/refs`, `HEAD`, `objects/info/packs`) whole, loose
-objects individually, and pack files never in full — the `.idx` index locates
-an object and an HTTP Range request fetches just that object's bytes from the
-`.pack`. Packs are immutable, so the browser HTTP cache absorbs repeat reads.
-Deltified objects are resolved recursively client-side.
+The app uses exactly the same data as a dumb-HTTP `git clone` would read, but
+only as necessary. It uses pack file `.idx` indexes to locate packed objects,
+and makes HTTP Range requests to fetch just that object's bytes from the
+`.pack`. Packs are immutable, so caching is handled natively by the browser.
 
 ## Hosting requirements for browsed repositories
 
 - A bare repository served as static files, with `git update-server-info`
-  run after each update (the `post-update` sample hook does this).
-- CORS headers allowing the browsing origin, exposing `Accept-Ranges` and
-  `Content-Range`.
-- Range request support (standard on almost every static host); without it
-  the app falls back to whole-file fetches.
+  run after each update (see `.git/hooks/post-update.sample ` for how to do
+  this automatically).
+- If `rgitweb` is not on the same origin as the repository, the repo must
+  be served with suitable CORS headers allowing the browsing origin, exposing `Accept-Ranges` and `Content-Range`.
+- For efficiency, the server should support Range requests; without it the app
+  falls back to fetching the entire pack file into memory at once.
 
 ## Development
 
@@ -35,30 +34,29 @@ npm run lint:fix  # ESLint (includes formatting)
 npm run build     # static site in dist/
 ```
 
-See `AGENTS.md` for architecture notes and conventions.
+See `ARCHITECTURE.md` for architecture notes and conventions.
 
-## Featured repositories
+## Configuration
 
-The start page can list repositories configured by a JSON file rather than
-taking an arbitrary URL — most Git hosts don't send the CORS headers this app
-needs, so a free-text box mostly produces CORS errors. Set `VITE_CONFIG_PATH`
-at build time to fetch a config file whose current schema contains a
-`featuredRepos` array of objects with `name` and `url` strings. When
-`VITE_CONFIG_PATH` is unset, no config is fetched.
+There are a few UI options that can be dynamically configured with a JSON
+file loaded at runtime. To enable this feature, set `VITE_CONFIG_PATH` at
+build time to a (possibly relative) URL path to this JSON file. If this
+variable is unset during the build, the app does not fetch a config. See
+`src/ui/config.ts` for documentation on configuration options.
+
+## History
+
+This repository was forked from https://github.com/andrewaylett/rgitweb,
+which appears to have been largely or entirely AI-generated in a single
+commit. That code mostly worked, though the UI was a bit weird and there
+were some half-baked features that have been removed.
+
+The UI has subsequently been significantly reworked; the original `src/git`
+has largely been left alone since for the most part it seems to work fine
+as-is.
 
 ## Example deployment
 
-`.github/workflows/deploy.yml` publishes this repository's own history to
-GitHub Pages as a demo: it builds the site, copies this repo's `.git`
-directory into the output, runs `git update-server-info` on the copy, and
-copies `.github/demo.config.json` to `dist/config.json`. That config points
-the featured-repositories list at the published copy, so the deployed site
-can browse its own source.
+This fork can be seen in action at https://src.wolfgangfaust.com/browse/#/r/%2Frgitweb.git
 
-This requires the repository's Pages source to be set to "GitHub Actions"
-(repo Settings → Pages) before the first run; the workflow can't set that
-itself.
-
-## License
-
-Apache-2.0
+The upstream project has a demo available at https://andrewaylett.github.io/rgitweb/#/r/https%3A%2F%2Fandrewaylett.github.io%2Frgitweb%2Fgit/summary
