@@ -20,18 +20,8 @@ export function refsPath(repoUrl: string): string {
   return `${repoRoot(repoUrl)}/refs`;
 }
 
-export function logPath(
-  repoUrl: string,
-  rev: string,
-  options?: { readonly from?: string },
-): string {
-  const base = `${repoRoot(repoUrl)}/log/${encodeURIComponent(rev)}`;
-  const params = new URLSearchParams();
-  if (options?.from) {
-    params.set("from", options.from);
-  }
-  const query = params.toString();
-  return query ? `${base}?${query}` : base;
+export function logPath(repoUrl: string, rev: string): string {
+  return `${repoRoot(repoUrl)}/log/${encodeURIComponent(rev)}`;
 }
 
 export function commitPath(repoUrl: string, oid: string): string {

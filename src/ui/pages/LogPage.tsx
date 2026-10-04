@@ -1,4 +1,6 @@
-import { useParams, useSearchParams, Link } from "react-router";
+import { useState } from "react";
+
+import { useParams } from "react-router";
 
 import { ErrorPanel } from "../components/ErrorPanel.js";
 import { CommitSummary } from "../components/CommitSummary.js";
@@ -6,56 +8,97 @@ import { LoadingPanel } from "../components/LoadingPanel.js";
 import { RefPicker } from "../components/RefPicker.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
-import { logPath, repoDisplayName } from "../paths.js";
+import { repoDisplayName } from "../paths.js";
 import { useRepo } from "../repoOutletContext.js";
 import { resolveCommitOid } from "../utils/resolveCommit.js";
-import { type Commit, type Oid, type Repository } from "../../git/index.js";
+import { type Commit, type Repository } from "../../git/index.js";
 
 const PAGE_SIZE = 50;
 
-interface LogPageResult {
+interface Page {
   readonly commits: readonly Commit[];
-  readonly hasMore: boolean;
+  readonly done: boolean;
 }
 
-async function fetchPage(
-  repository: Repository,
-  rev: string,
-  from: Oid | undefined,
-): Promise<LogPageResult> {
-  const startOid = from ?? (await resolveCommitOid(repository, rev));
+async function readPage(iterator: AsyncGenerator<Commit>): Promise<Page> {
   const commits: Commit[] = [];
-  let skippedCursor = from === undefined;
-  for await (const commit of repository.log(startOid, {
-    limit: PAGE_SIZE + 2,
-  })) {
-    if (!skippedCursor) {
-      if (commit.oid === from) {
-        skippedCursor = true;
-      }
-      continue;
+  while (commits.length < PAGE_SIZE) {
+    const next = await iterator.next();
+    if (next.done) {
+      return { commits, done: true };
     }
-    commits.push(commit);
-    if (commits.length > PAGE_SIZE) {
-      break;
-    }
+    commits.push(next.value);
   }
-  const hasMore = commits.length > PAGE_SIZE;
-  return { commits: commits.slice(0, PAGE_SIZE), hasMore };
+  return { commits, done: false };
+}
+
+async function fetchFirstPage(repository: Repository, rev: string) {
+  const iterator = repository.log(await resolveCommitOid(repository, rev));
+  return { iterator, page: await readPage(iterator) };
+}
+
+function LogList({
+  url,
+  iterator,
+  firstPage,
+}: {
+  readonly url: string;
+  readonly iterator: AsyncGenerator<Commit>;
+  readonly firstPage: Page;
+}) {
+  const [{ commits, done }, setPage] = useState(firstPage);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<unknown>();
+
+  const loadMore = () => {
+    setLoading(true);
+    setError(undefined);
+    readPage(iterator).then(
+      (next) => {
+        setPage((previous) => ({
+          commits: [...previous.commits, ...next.commits],
+          done: next.done,
+        }));
+        setLoading(false);
+      },
+      (error_: unknown) => {
+        setError(error_);
+        setLoading(false);
+      },
+    );
+  };
+
+  return (
+    <>
+      <div className="log-commits">
+        {commits.map((commit) => (
+          <CommitSummary key={commit.oid} repoUrl={url} commit={commit} />
+        ))}
+      </div>
+      {commits.length === 0 && <p>No commits.</p>}
+      {error !== undefined && <ErrorPanel error={error} />}
+      {loading && <LoadingPanel />}
+      {!done && !loading && (
+        <p>
+          <button type="button" onClick={loadMore}>
+            Load more
+          </button>
+        </p>
+      )}
+    </>
+  );
 }
 
 export function LogPage() {
   const { repository, url } = useRepo();
   const { ref: routeRev } = useParams<{ ref: string }>();
   const rev = routeRev ?? "";
-  const [searchParams] = useSearchParams();
-  const from = searchParams.get("from") ?? undefined;
 
   useDocumentTitle(`${repoDisplayName(url)} — log (${rev})`);
 
   const state = useAsync(
-    () => fetchPage(repository, rev, from),
-    [repository, rev, from],
+    () => fetchFirstPage(repository, rev),
+    [repository, rev],
   );
 
   if (state.status === "loading") {
@@ -64,9 +107,6 @@ export function LogPage() {
   if (state.status === "error") {
     return <ErrorPanel error={state.error} />;
   }
-
-  const { commits, hasMore } = state.data;
-  const last = commits.at(-1);
 
   return (
     <div>
@@ -77,17 +117,11 @@ export function LogPage() {
         path=""
         destination="log"
       />
-      <div className="log-commits">
-        {commits.map((commit) => (
-          <CommitSummary key={commit.oid} repoUrl={url} commit={commit} />
-        ))}
-      </div>
-      {commits.length === 0 && <p>No commits.</p>}
-      {hasMore && last && (
-        <p>
-          <Link to={logPath(url, rev, { from: last.oid })}>older →</Link>
-        </p>
-      )}
+      <LogList
+        url={url}
+        iterator={state.data.iterator}
+        firstPage={state.data.page}
+      />
     </div>
   );
 }

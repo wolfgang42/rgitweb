@@ -45,9 +45,10 @@ These are true of the implementation but not obvious from `types.ts`:
 - `Repository.resolve()` does **not** peel annotated tags: it returns the tag
   object's own oid. UI code that needs a commit peels explicitly (see
   `src/ui/utils/resolveCommit.ts`).
-- `log(start)` yields `start` itself as its first item. The log page's
-  `?from=` pagination cursor relies on this inclusivity; making the walk
-  exclusive would silently break "older" pages rather than erroring.
+- `log(start)` is a lazy generator that yields `start` itself first and walks
+  all parents (merges included) in committer-date order. It has no limit or
+  cursor; the log page paginates by keeping the generator alive and pulling
+  more commits on demand.
 - `getCommit`/`getTree` throw a plain `Error` (not `NotFoundError`) when the
   oid exists but has the wrong type.
 - Raw tree objects store directory modes unpadded (`40000`); `git ls-tree`

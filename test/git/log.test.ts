@@ -23,25 +23,6 @@ describe("Repository.log", () => {
     expect(commits.map((c) => c.oid)).toEqual(expectedOids);
   });
 
-  it("respects limit", async () => {
-    const { repo } = await openFixtureRepository();
-    const headOid = runGit(["rev-parse", "HEAD"]);
-    const commits = await collect(repo.log(headOid, { limit: 3 }));
-    expect(commits).toHaveLength(3);
-
-    const expectedFirstThree = runGit([
-      "log",
-      "--date-order",
-      "--format=%H",
-      "-n",
-      "3",
-      headOid,
-    ])
-      .split("\n")
-      .filter((l) => l.length > 0);
-    expect(commits.map((c) => c.oid)).toEqual(expectedFirstThree);
-  });
-
   it("exposes both parents of the merge commit", async () => {
     const { repo } = await openFixtureRepository();
     const mergeOid = runGit(["rev-parse", "HEAD^1"]); // the merge is HEAD's parent

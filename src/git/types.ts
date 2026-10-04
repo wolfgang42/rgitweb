@@ -82,11 +82,6 @@ export interface Head {
   readonly oid: Oid;
 }
 
-export interface LogOptions {
-  /** Maximum number of commits to yield. */
-  readonly limit?: number;
-}
-
 /**
  * A read-only view of one remote repository. Obtain via `openRepository`.
  * Implementations cache parsed objects in memory for the lifetime of the
@@ -120,7 +115,7 @@ export interface Repository {
    * Walk history from `start` (a commit oid), newest first, following all
    * parents (topological-ish, ordered by committer date like git log).
    */
-  log(start: Oid, options?: LogOptions): AsyncGenerator<Commit>;
+  log(start: Oid): AsyncGenerator<Commit>;
 
   /**
    * Resolve a slash-separated path within the given commit or tree.

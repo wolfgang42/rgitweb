@@ -18,7 +18,6 @@ import {
   type GitConfig,
   type GitObject,
   type Head,
-  type LogOptions,
   NotFoundError,
   type Oid,
   type Ref,
@@ -207,12 +206,7 @@ export function createRepositoryImpl(
     return entry;
   }
 
-  async function* log(
-    start: Oid,
-    options?: LogOptions,
-  ): AsyncGenerator<Commit> {
-    const limit = options?.limit;
-
+  async function* log(start: Oid): AsyncGenerator<Commit> {
     const seen = new Set<Oid>();
     // Small sorted-by-committer-date-desc worklist. Repositories browsed by
     // this app are small enough that a naive sort-on-insert is fine; a real
@@ -240,16 +234,11 @@ export function createRepositoryImpl(
     }
 
     await enqueue(start);
-    let yielded = 0;
 
     while (pending.length > 0) {
       const commit = definite(pending.shift(), "worklist unexpectedly empty");
 
       yield commit;
-      yielded++;
-      if (limit !== undefined && yielded >= limit) {
-        return;
-      }
 
       for (const parentOid of commit.parents) {
         await enqueue(parentOid);
