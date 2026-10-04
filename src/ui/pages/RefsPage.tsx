@@ -1,82 +1,10 @@
-import { Link } from "react-router";
-
 import { ErrorPanel } from "../components/ErrorPanel.js";
 import { LoadingPanel } from "../components/LoadingPanel.js";
-import { OidLink } from "../components/OidLink.js";
 import { RefCommitRow } from "../components/RefCommitRow.js";
-import { RelativeDate } from "../components/RelativeDate.js";
 import { useAsync } from "../hooks/useAsync.js";
 import { useDocumentTitle } from "../hooks/useDocumentTitle.js";
-import { repoDisplayName, treePath } from "../paths.js";
+import { repoDisplayName } from "../paths.js";
 import { useRepo } from "../repoOutletContext.js";
-import {
-  type AnnotatedTag,
-  type Ref,
-  type Repository,
-} from "../../git/index.js";
-
-function AnnotatedTagRow({
-  repoUrl,
-  refName,
-  tag,
-}: {
-  readonly repoUrl: string;
-  readonly refName: string;
-  readonly tag: AnnotatedTag;
-}) {
-  return (
-    <tr>
-      <td className="ref-name">
-        <Link to={treePath(repoUrl, refName.slice("refs/tags/".length))}>
-          {tag.name}
-        </Link>
-      </td>
-      <td>
-        <OidLink repoUrl={repoUrl} oid={tag.targetOid} />
-      </td>
-      <td className="summary">{tag.message.split("\n", 1)[0]}</td>
-      <td>{tag.tagger?.name ?? "—"}</td>
-      <td>{tag.tagger ? <RelativeDate date={tag.tagger.date} /> : "—"}</td>
-    </tr>
-  );
-}
-
-function TagRow({
-  repoUrl,
-  repository,
-  tagRef,
-}: {
-  readonly repoUrl: string;
-  readonly repository: Repository;
-  readonly tagRef: Ref;
-}) {
-  const isAnnotated = tagRef.peeledOid !== undefined;
-  const state = useAsync(
-    async () => (isAnnotated ? repository.getTag(tagRef.oid) : undefined),
-    [repository, tagRef.oid],
-  );
-
-  if (!isAnnotated) {
-    return (
-      <RefCommitRow
-        repoUrl={repoUrl}
-        repository={repository}
-        reference={tagRef}
-      />
-    );
-  }
-  if (state.status !== "success" || !state.data) {
-    return (
-      <tr>
-        <td className="ref-name">{tagRef.name.slice("refs/tags/".length)}</td>
-        <td colSpan={4}>{state.status === "error" ? "failed to load" : "…"}</td>
-      </tr>
-    );
-  }
-  return (
-    <AnnotatedTagRow repoUrl={repoUrl} refName={tagRef.name} tag={state.data} />
-  );
-}
 
 export function RefsPage() {
   const { repository, url } = useRepo();
@@ -128,11 +56,11 @@ export function RefsPage() {
         <table className="ref-table">
           <tbody>
             {tags.map((ref) => (
-              <TagRow
+              <RefCommitRow
                 key={ref.name}
                 repoUrl={url}
                 repository={repository}
-                tagRef={ref}
+                reference={ref}
               />
             ))}
           </tbody>

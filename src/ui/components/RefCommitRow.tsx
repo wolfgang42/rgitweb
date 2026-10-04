@@ -2,12 +2,10 @@ import { Link } from "react-router";
 
 import { useAsync } from "../hooks/useAsync.js";
 import { treePath } from "../paths.js";
-import { summaryLine } from "../utils/format.js";
 import { peelToCommit } from "../utils/resolveCommit.js";
 import { type Ref, type Repository } from "../../git/index.js";
 
-import { OidLink } from "./OidLink.js";
-import { RelativeDate } from "./RelativeDate.js";
+import { CommitSummary } from "./CommitSummary.js";
 
 /**
  * Table row showing a ref name plus the summary of the commit it points at.
@@ -37,16 +35,9 @@ export function RefCommitRow({
         <Link to={treePath(repoUrl, name)}>{name}</Link>
       </td>
       {state.status === "success" ? (
-        <>
-          <td>
-            <OidLink repoUrl={repoUrl} oid={state.data.oid} />
-          </td>
-          <td className="summary">{summaryLine(state.data.message)}</td>
-          <td>{state.data.author.name}</td>
-          <td>
-            <RelativeDate date={state.data.author.date} />
-          </td>
-        </>
+        <td colSpan={4}>
+          <CommitSummary repoUrl={repoUrl} commit={state.data} />
+        </td>
       ) : state.status === "error" ? (
         <td colSpan={4} className="error-inline">
           failed to load
